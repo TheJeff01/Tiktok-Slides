@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeffthedev — Frontend vs Backend</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --green:#22C55E;--green-light:#4ADE80;--green-dark:#15803D;
+    --blue:#3B82F6;--blue-light:#60A5FA;--blue-dark:#1D4ED8;
+    --light-bg:#F0FAF4;--light-border:#D1EAD8;--dark-bg:#0A0F0C;
+    --font:'Space Grotesk',sans-serif;
+  }
+  body{background:#111;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:40px 20px;font-family:var(--font);}
+  .ig-frame{width:420px;max-width:100%;background:#1a1a1a;border-radius:16px;box-shadow:0 32px 80px rgba(0,0,0,0.8);overflow:hidden;}
+  .ig-header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #222;}
+  .ig-avatar{width:36px;height:36px;border-radius:50%;border:2px solid var(--green);overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#22C55E,#15803D);display:flex;align-items:center;justify-content:center;}
+  .ig-avatar span{font-size:14px;font-weight:700;color:#fff;}
+  .ig-info{flex:1;}
+  .ig-handle{font-size:13px;font-weight:600;color:#fff;}
+  .ig-sub{font-size:11px;color:#666;}
+  .ig-more{color:#555;font-size:20px;cursor:pointer;}
+  .carousel-viewport{width:420px;aspect-ratio:4/5;overflow:hidden;position:relative;cursor:grab;user-select:none;}
+  .carousel-viewport:active{cursor:grabbing;}
+  .carousel-track{display:flex;height:100%;transition:transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);will-change:transform;}
+  .slide{width:420px;height:525px;flex-shrink:0;position:relative;display:flex;flex-direction:column;overflow:hidden;}
+  .slide-light{background:var(--light-bg);}
+  .slide-dark{background:var(--dark-bg);}
+  .tag{font-family:var(--font);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+  .tag-light{color:var(--green);}
+  .tag-dark{color:var(--green-light);}
+  .heading{font-family:var(--font);font-size:30px;font-weight:700;letter-spacing:-0.4px;line-height:1.1;}
+  .body-text{font-family:var(--font);font-size:14px;font-weight:400;line-height:1.55;}
+  .body-light{color:#3A4A40;}
+  .body-dark{color:rgba(255,255,255,0.65);}
+  .code-block{background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px;font-family:'Courier New',monospace;font-size:11.5px;line-height:1.65;}
+  .code-block-light{background:rgba(0,0,0,0.05);border:1px solid var(--light-border);border-radius:10px;padding:12px 14px;font-family:'Courier New',monospace;font-size:11.5px;line-height:1.65;}
+  .code-blue{color:#60A5FA;}
+  .code-green{color:var(--green-light);}
+  .code-nl{color:#2A3A30;}
+  .code-cmt{color:rgba(255,255,255,0.28);}
+  .code-cmt-l{color:rgba(0,0,0,0.32);}
+  .code-label{font-family:var(--font);font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;}
+  .badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:0.4px;}
+  .badge-blue{background:rgba(59,130,246,0.13);border:1px solid rgba(59,130,246,0.28);color:#60A5FA;}
+  .badge-green{background:rgba(34,197,94,0.13);border:1px solid rgba(34,197,94,0.28);color:#4ADE80;}
+  .badge-orange{background:rgba(251,146,60,0.13);border:1px solid rgba(251,146,60,0.28);color:#FB923C;}
+  .noise{position:absolute;inset:0;opacity:0.025;pointer-events:none;z-index:1;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:150px 150px;}
+  .ig-dots{display:flex;justify-content:center;gap:5px;padding:10px;}
+  .dot{width:6px;height:6px;border-radius:50%;background:#444;transition:background 0.3s,transform 0.3s;}
+  .dot.active{background:var(--green);transform:scale(1.2);}
+  .ig-actions{display:flex;align-items:center;padding:8px 16px;gap:14px;}
+  .ig-actions svg{color:#aaa;cursor:pointer;}
+  .ig-actions svg:hover{color:#fff;}
+  .ig-bookmark{margin-left:auto;}
+  .ig-caption{padding:0 16px 16px;font-size:13px;color:#aaa;line-height:1.5;}
+  .ig-caption strong{color:#fff;}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;font-size:11px;font-weight:600;}
+  .pill-blue{background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);color:#60A5FA;}
+  .pill-green{background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#4ADE80;}
+  .divider{height:1px;background:rgba(255,255,255,0.07);margin:10px 0;}
+  .divider-light{height:1px;background:rgba(0,0,0,0.08);margin:10px 0;}
+  .progress-bar{position:absolute;bottom:0;left:0;right:0;padding:16px 28px 20px;z-index:10;display:flex;align-items:center;gap:10px;}
+  .progress-track{flex:1;height:3px;border-radius:2px;overflow:hidden;}
+  .progress-track-dark{background:rgba(255,255,255,0.12);}
+  .progress-track-light{background:rgba(0,0,0,0.08);}
+  .progress-fill{height:100%;border-radius:2px;}
+  .progress-fill-dark{background:#fff;}
+  .progress-fill-light{background:var(--green);}
+  .slide-num-dark{font-size:11px;color:rgba(255,255,255,0.4);font-weight:500;}
+  .slide-num-light{font-size:11px;color:rgba(0,0,0,0.3);font-weight:500;}
+  .arrow-dark{position:absolute;right:0;top:0;bottom:0;width:48px;z-index:9;display:flex;align-items:center;justify-content:center;background:linear-gradient(to right,transparent,rgba(255,255,255,0.07));}
+  .arrow-light{position:absolute;right:0;top:0;bottom:0;width:48px;z-index:9;display:flex;align-items:center;justify-content:center;background:linear-gradient(to right,transparent,rgba(0,0,0,0.05));}
+  .tech-pill{display:inline-flex;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:600;margin:3px;}
+  .tech-pill-blue{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.25);color:#60A5FA;}
+  .tech-pill-green{background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.25);color:#4ADE80;}
+  .tech-pill-orange{background:rgba(251,146,60,0.12);border:1px solid rgba(251,146,60,0.25);color:#FB923C;}
+  .compare-row{display:flex;gap:8px;margin-bottom:6px;}
+  .compare-col{flex:1;padding:9px 10px;border-radius:8px;font-size:11.5px;font-weight:500;font-family:var(--font);}
+  .compare-col-blue{background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);color:#93C5FD;}
+  .compare-col-green{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:#86EFAC;}
+</style>
+</head>
+<body>
+<div class="ig-frame">
+
+  <div class="ig-header">
+    <div class="ig-avatar"><span>J</span></div>
+    <div class="ig-info">
+      <div class="ig-handle">Jeffthedev__</div>
+      <div class="ig-sub">Developer Education</div>
+    </div>
+    <div class="ig-more">···</div>
+  </div>
+
+  <div class="carousel-viewport" id="viewport">
+    <div class="carousel-track" id="track">
+
+      <!-- SLIDE 1 — COVER -->
+      <div class="slide slide-dark" style="background:linear-gradient(160deg,#0A0F0C 60%,#0d1f14 100%);">
+        <div class="noise"></div>
+        <div style="position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(59,130,246,0.12) 0%,transparent 70%);pointer-events:none;z-index:1;"></div>
+        <div style="position:absolute;bottom:-40px;left:-40px;width:240px;height:240px;background:radial-gradient(circle,rgba(34,197,94,0.1) 0%,transparent 70%);pointer-events:none;z-index:1;"></div>
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:0 32px 72px;">
+          <div style="display:flex;gap:8px;margin-bottom:18px;">
+            <span class="pill pill-blue">Frontend</span>
+            <span style="color:rgba(255,255,255,0.3);font-size:18px;line-height:1.5;">vs</span>
+            <span class="pill pill-green">Backend</span>
+          </div>
+          <div class="heading" style="color:#fff;margin-bottom:14px;font-size:34px;">What's the<br><span style="color:var(--green-light);">real difference</span><br>anyway?</div>
+          <p class="body-text body-dark" style="font-size:13px;max-width:280px;">If you've ever been confused about which to learn, this will clear it up for good.</p>
+          <p class="body-text" style="font-size:12px;color:rgba(255,255,255,0.28);margin-top:16px;">Swipe to find out →</p>
+        </div>
+        <div class="arrow-dark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="rgba(255,255,255,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="progress-bar">
+          <div class="progress-track progress-track-dark"><div class="progress-fill progress-fill-dark" style="width:11.11%;"></div></div>
+          <span class="slide-num-dark">1/9</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 2 — WHAT IS FRONTEND -->
+      <div class="slide slide-dark">
+        <div class="noise"></div>
+        <div style="position:absolute;top:-60px;right:-60px;width:250px;height:250px;background:radial-gradient(circle,rgba(59,130,246,0.1) 0%,transparent 70%);pointer-events:none;z-index:1;"></div>
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:0 32px 52px;">
+          <span class="tag tag-dark" style="margin-bottom:11px;color:#60A5FA;">What Is Frontend?</span>
+          <div class="heading" style="color:#fff;margin-bottom:14px;font-size:28px;">The part users<br><span style="color:#60A5FA;">see & touch</span></div>
+          <p class="body-text body-dark" style="margin-bottom:16px;font-size:13px;">Frontend is everything that runs in the browser — the layout, buttons, animations, and interactivity. If a user can click it, see it, or scroll it, that's frontend.</p>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:9px;">
+              <div style="width:5px;height:5px;border-radius:50%;background:#60A5FA;flex-shrink:0;margin-top:6px;"></div>
+              <span style="font-family:var(--font);font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.5;">Renders HTML, CSS, and JavaScript in the browser</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:9px;">
+              <div style="width:5px;height:5px;border-radius:50%;background:#60A5FA;flex-shrink:0;margin-top:6px;"></div>
+              <span style="font-family:var(--font);font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.5;">Handles user interaction and visual feedback</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:9px;">
+              <div style="width:5px;height:5px;border-radius:50%;background:#60A5FA;flex-shrink:0;margin-top:6px;"></div>
+              <span style="font-family:var(--font);font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.5;">Communicates with the backend via APIs</span>
+            </div>
+          </div>
+        </div>
+        <div class="arrow-dark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="rgba(255,255,255,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="progress-bar">
+          <div class="progress-track progress-track-dark"><div class="progress-fill progress-fill-dark" style="width:22.22%;"></div></div>
+          <span class="slide-num-dark">2/9</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 3 — FRONTEND TECHNOLOGIES -->
+      <div class="slide slide-light">
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:0 32px 52px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;">
+            <span class="tag tag-light" style="color:#3B82F6;">Frontend Stack</span>
+            <span class="badge badge-blue">The Browser Side</span>
+          </div>
+          <div class="heading" style="color:#0A0F0C;font-size:26px;margin-bottom:12px;">What frontend<br><span style="color:#3B82F6;">devs actually use</span></div>
+          <div style="margin-bottom:10px;">
+            <div class="code-label" style="color:#3B82F6;">Core</div>
+            <div style="display:flex;flex-wrap:wrap;">
+              <span class="tech-pill tech-pill-blue">HTML</span>
+              <span class="tech-pill tech-pill-blue">CSS</span>
+              <span class="tech-pill tech-pill-blue">JavaScript</span>
+              <span class="tech-pill tech-pill-blue">TypeScript</span>
+            </div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div class="code-label" style="color:#3B82F6;">Frameworks</div>
+            <div style="display:flex;flex-wrap:wrap;">
+              <span class="tech-pill tech-pill-blue">React</span>
+              <span class="tech-pill tech-pill-blue">Vue</span>
+              <span class="tech-pill tech-pill-blue">Angular</span>
+              <span class="tech-pill tech-pill-blue">Next.js</span>
+              <span class="tech-pill tech-pill-blue">Svelte</span>
+            </div>
+          </div>
+          <div>
+            <div class="code-label" style="color:#3B82F6;">Styling</div>
+            <div style="display:flex;flex-wrap:wrap;">
+              <span class="tech-pill tech-pill-blue">Tailwind CSS</span>
+              <span class="tech-pill tech-pill-blue">SCSS</span>
+              <span class="tech-pill tech-pill-blue">styled-components</span>
+            </div>
+          </div>
+        </div>
+        <div class="arrow-light"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="rgba(0,0,0,0.22)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="progress-bar">
+          <div class="progress-track progress-track-light"><div class="progress-fill progress-fill-light" style="width:33.33%;background:#3B82F6;"></div></div>
+          <span class="slide-num-light">3/9</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 4 — WHAT IS BACKEND -->
+      <div class="slide slide-dark">
+        <div class="noise"></div>
+        <div style="position:absolute;bottom:-60px;right:-60px;width:250px;height:250px;background:radial-gradient(circle,rgba(34,197,94,0.1) 0%,transparent 70%);pointer-events:none;z-index:1;"></div>
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:0 32px 52px;">
+          <span class="tag tag-dark" style="margin-bottom:11px;">What Is Backend?</span>
+          <div class="heading" style="color:#fff;margin-bottom:14px;font-size:28px;">The engine<br><span style="color:var(--green-light);">under the hood</span></div>
+          <p class="body-text body-dark" style="margin-bottom:16px;font-size:13px;">Backend is everything that runs on the server — logic, databases, authentication, and APIs. Users never see it, but nothing works without it.</p>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:9px;">
+              <div style="width:5px;height:5px;border-radius:50%;background:#4ADE80;flex-shrink:0;margin-top:6px;"></div>
+              <span style="font-family:var(--font);font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.5;">Stores and retrieves data from databases</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:9px;">
+              <div style="width:5px;height:5px;border-radius:50%;background:#4ADE80;flex-shrink:0;margin-top:6px;"></div>
+              <span style="font-family:var(--font);font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.5;">Handles auth, business logic, and security</span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:9px;">
+              <div style="width:5px;height:5px;border-radius:50%;background:#4ADE80;flex-shrink:0;margin-top:6px;"></div>
+              <span style="font-family:var(--font);font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.5;">Exposes APIs the frontend can call</span>
+            </div>
+          </div>
+        </div>
+        <div class="arrow-dark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="rgba(255,255,255,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="progress-bar">
+          <div class="progress-track progress-track-dark"><div class="progress-fill progress-fill-dark" style="width:44.44%;"></div></div>
+          <span class="slide-num-dark">4/9</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 5 — BACKEND TECHNOLOGIES -->
+      <div class="slide slide-light">
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:0 32px 52px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;">
+            <span class="tag tag-light">Backend Stack</span>
+            <span class="badge badge-green">The Server Side</span>
+          </div>
+          <div class="heading" style="color:#0A0F0C;font-size:26px;margin-bottom:12px;">What backend<br><span style="color:var(--green-dark);">devs actually use</span></div>
+          <div style="margin-bottom:10px;">
+            <div class="code-label" style="color:var(--green-dark);">Languages</div>
+            <div style="display:flex;flex-wrap:wrap;">
+              <span class="tech-pill tech-pill-green">Node.js</span>
+              <span class="tech-pill tech-pill-green">Python</span>
+              <span class="tech-pill tech-pill-green">Java</span>
+              <span class="tech-pill tech-pill-green">Go</span>
+              <span class="tech-pill tech-pill-green">PHP</span>
+            </div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <div class="code-label" style="color:var(--green-dark);">Frameworks</div>
+            <div style="display:flex;flex-wrap:wrap;">
+              <span class="tech-pill tech-pill-green">Express</span>
+              <span class="tech-pill tech-pill-green">FastAPI</span>
+              <span class="tech-pill tech-pill-green">Django</span>
+              <span class="tech-pill tech-pill-green">Laravel</span>
+            </div>
+          </div>
+          <div>
+            <div class="code-label" style="color:var(--green-dark);">Databases & Infra</div>
+            <div style="display:flex;flex-wrap:wrap;">
+              <span class="tech-pill tech-pill-green">PostgreSQL</span>
+              <span class="tech-pill tech-pill-green">MongoDB</span>
+              <span class="tech-pill tech-pill-green">Redis</span>
+              <span class="tech-pill tech-pill-green">Docker</span>
+            </div>
+          </div>
+        </div>
+        <div class="arrow-light"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="rgba(0,0,0,0.22)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="progress-bar">
+          <div class="progress-track progress-track-light"><div class="progress-fill progress-fill-light" style="width:55.55%;"></div></div>
+          <span class="slide-num-light">5/9</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 6 — KEY DIFFERENCES -->
+      <div class="slide slide-dark">
+        <div class="noise"></div>
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:0 28px 52px;">
+          <span class="tag tag-dark" style="margin-bottom:11px;">Side by Side</span>
+          <div class="heading" style="color:#fff;margin-bottom:14px;font-size:26px;">Key differences<br><span style="color:var(--green-light);">at a glance</span></div>
+          <div style="display:flex;gap:8px;margin-bottom:7px;">
+            <div style="flex:1;text-align:center;padding:5px 0;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:7px;font-size:11px;font-weight:700;color:#60A5FA;font-family:var(--font);">Frontend</div>
+            <div style="flex:1;text-align:center;padding:5px 0;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:7px;font-size:11px;font-weight:700;color:#4ADE80;font-family:var(--font);">Backend</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-col compare-col-blue">Runs in browser</div>
+            <div class="compare-col compare-col-green">Runs on server</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-col compare-col-blue">User sees output</div>
+            <div class="compare-col compare-col-green">User never sees it</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-col compare-col-blue">HTML, CSS, JS</div>
+            <div class="compare-col compare-col-green">Python, Node, Go</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-col compare-col-blue">UI & UX focused</div>
+            <div class="compare-col compare-col-green">Data & logic focused</div>
+          </div>
+          <div class="compare-row">
+            <div class="compare-col compare-col-blue">Calls APIs</div>
+            <div class="compare-col compare-col-green">Builds APIs</div>
+          </div>
+        </div>
+        <div class="arrow-dark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="rgba(255,255,255,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="progress-bar">
+          <div class="progress-track progress-track-dark"><div class="progress-fill progress-fill-dark" style="width:66.66%;"></div></div>
+          <span class="slide-num-dark">6/9</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 7 — SALARIES & JOBS -->
+      <div class="slide slide-light">
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:0 32px 52px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;">
+            <span class="tag tag-light">The Job Market</span>
+            <span class="badge badge-orange">2024 Reality</span>
+          </div>
+          <div class="heading" style="color:#0A0F0C;font-size:26px;margin-bottom:12px;">Which pays<br><span style="color:var(--green-dark);">more?</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+            <div style="padding:11px 13px;background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.18);border-radius:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:13px;font-weight:700;color:#1D4ED8;font-family:var(--font);">Frontend Dev</span>
+                <span style="font-size:13px;font-weight:700;color:#3B82F6;font-family:var(--font);">$90k – $140k</span>
+              </div>
+              <p style="font-size:11.5px;color:#3A4A40;font-family:var(--font);">Roles: UI Dev, React Dev, Web Designer+Dev</p>
+            </div>
+            <div style="padding:11px 13px;background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.18);border-radius:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:13px;font-weight:700;color:#15803D;font-family:var(--font);">Backend Dev</span>
+                <span style="font-size:13px;font-weight:700;color:var(--green-dark);font-family:var(--font);">$100k – $160k</span>
+              </div>
+              <p style="font-size:11.5px;color:#3A4A40;font-family:var(--font);">Roles: API Dev, DB Engineer, Systems Engineer</p>
+            </div>
+            <div style="padding:11px 13px;background:rgba(251,146,60,0.07);border:1px solid rgba(251,146,60,0.18);border-radius:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:13px;font-weight:700;color:#C2410C;font-family:var(--font);">Full-Stack Dev</span>
+                <span style="font-size:13px;font-weight:700;color:#EA580C;font-family:var(--font);">$110k – $170k</span>
+              </div>
+              <p style="font-size:11.5px;color:#3A4A40;font-family:var(--font);">Does both — most in-demand at startups</p>
+            </div>
+          </div>
+          <p style="font-size:11px;color:rgba(0,0,0,0.35);font-family:var(--font);">* US averages. Varies by location & experience.</p>
+        </div>
+        <div class="arrow-light"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="rgba(0,0,0,0.22)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="progress-bar">
+          <div class="progress-track progress-track-light"><div class="progress-fill progress-fill-light" style="width:77.77%;"></div></div>
+          <span class="slide-num-light">7/9</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 8 — WHICH TO LEARN FIRST -->
+      <div class="slide slide-dark">
+        <div class="noise"></div>
+        <div style="position:absolute;top:-40px;left:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(34,197,94,0.08) 0%,transparent 70%);pointer-events:none;z-index:1;"></div>
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:0 32px 52px;">
+          <span class="tag tag-dark" style="margin-bottom:11px;">The Answer</span>
+          <div class="heading" style="color:#fff;margin-bottom:14px;font-size:26px;">Which should you<br><span style="color:var(--green-light);">learn first?</span></div>
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <div style="padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;">
+              <div style="font-size:13px;font-weight:700;color:#fff;font-family:var(--font);margin-bottom:5px;">Start with Frontend if…</div>
+              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">You're visual, love design, want to see results fast, or you're building web products from scratch.</p>
+            </div>
+            <div style="padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;">
+              <div style="font-size:13px;font-weight:700;color:#fff;font-family:var(--font);margin-bottom:5px;">Start with Backend if…</div>
+              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">You love logic, data, and solving complex problems. You prefer systems over aesthetics.</p>
+            </div>
+            <div style="padding:12px 14px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.18);border-radius:10px;">
+              <div style="font-size:13px;font-weight:700;color:var(--green-light);font-family:var(--font);margin-bottom:5px;">Real talk →</div>
+              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">Most devs start frontend (HTML/CSS/JS) then branch out. Either path works — just pick and commit.</p>
+            </div>
+          </div>
+        </div>
+        <div class="arrow-dark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="rgba(255,255,255,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="progress-bar">
+          <div class="progress-track progress-track-dark"><div class="progress-fill progress-fill-dark" style="width:88.88%;"></div></div>
+          <span class="slide-num-dark">8/9</span>
+        </div>
+      </div>
+
+      <!-- SLIDE 9 — CTA -->
+      <div class="slide" style="background:linear-gradient(160deg,#0d1f14 0%,#0A0F0C 100%);">
+        <div class="noise"></div>
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(34,197,94,0.12) 0%,transparent 65%);pointer-events:none;z-index:1;"></div>
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:0 32px;text-align:center;">
+          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#22C55E,#15803D);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 0 30px rgba(34,197,94,0.25);">
+            <span style="font-size:22px;font-weight:800;color:#fff;font-family:var(--font);">J</span>
+          </div>
+          <div class="heading" style="color:#fff;font-size:26px;margin-bottom:12px;line-height:1.2;">Now you know the<br><span style="color:var(--green-light);">difference.</span></div>
+          <p class="body-text body-dark" style="font-size:13px;margin-bottom:24px;max-width:280px;">Follow <strong style="color:#fff;">@Jeffthedev__</strong> for more dev breakdowns, tips, and roadmaps every week.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+            <div style="padding:8px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:20px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);font-family:var(--font);">💾 Save this post</div>
+            <div style="padding:8px 16px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:20px;font-size:12px;font-weight:600;color:var(--green-light);font-family:var(--font);">📤 Share it</div>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-track progress-track-dark"><div class="progress-fill progress-fill-dark" style="width:100%;"></div></div>
+          <span class="slide-num-dark">9/9</span>
+        </div>
+      </div>
+
+    </div><!-- /carousel-track -->
+  </div><!-- /carousel-viewport -->
+
+  <div class="ig-dots" id="dots">
+    <div class="dot active" data-idx="0"></div>
+    <div class="dot" data-idx="1"></div>
+    <div class="dot" data-idx="2"></div>
+    <div class="dot" data-idx="3"></div>
+    <div class="dot" data-idx="4"></div>
+    <div class="dot" data-idx="5"></div>
+    <div class="dot" data-idx="6"></div>
+    <div class="dot" data-idx="7"></div>
+    <div class="dot" data-idx="8"></div>
+  </div>
+
+  <div class="ig-actions">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    <div class="ig-bookmark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+  </div>
+
+  <div class="ig-caption">
+    <strong>Jeffthedev__</strong> Frontend vs Backend — the clearest breakdown you'll find. Save this before you pick your path. 🚀 Follow for weekly dev content.
+  </div>
+
+</div><!-- /ig-frame -->
+
+<script>
+  const track=document.getElementById('track'),viewport=document.getElementById('viewport'),allDots=document.querySelectorAll('.dot');
+  const TOTAL=9,SLIDE_W=420;
+  let current=0,startX=0,isDragging=false,dragOffset=0;
+  function goTo(idx){
+    current=Math.max(0,Math.min(TOTAL-1,idx));
+    track.style.transition='transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)';
+    track.style.transform=`translateX(${-current*SLIDE_W}px)`;
+    allDots.forEach((d,i)=>d.classList.toggle('active',i===current));
+  }
+  viewport.addEventListener('pointerdown',e=>{isDragging=true;startX=e.clientX;dragOffset=0;track.style.transition='none';viewport.setPointerCapture(e.pointerId);});
+  viewport.addEventListener('pointermove',e=>{if(!isDragging)return;dragOffset=e.clientX-startX;track.style.transform=`translateX(${-current*SLIDE_W+dragOffset}px)`;});
+  viewport.addEventListener('pointerup',()=>{if(!isDragging)return;isDragging=false;if(dragOffset<-SLIDE_W*0.2)goTo(current+1);else if(dragOffset>SLIDE_W*0.2)goTo(current-1);else goTo(current);});
+  allDots.forEach(d=>d.addEventListener('click',()=>goTo(+d.dataset.idx)));
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')goTo(current+1);if(e.key==='ArrowLeft')goTo(current-1);});
+</script>
+</body>
+</html>
