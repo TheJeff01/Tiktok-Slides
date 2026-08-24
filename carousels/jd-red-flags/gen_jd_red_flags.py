@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-# Build tutorial-vs-job.html from the git-commands.html code-block shell,
+# Build jd-red-flags.html from the git-commands.html code-block shell,
 # swapping only the text content (cover, 7 content slides, CTA, caption, title).
 # Base64 images (avatar / cover portrait / wordmark / CTA) are reused verbatim.
 
 import io
+import os
 
-SRC = "git-commands.html"
-OUT = "tutorial-vs-job.html"
+BASE = os.path.dirname(os.path.abspath(__file__))
+SRC = os.path.join(BASE, "..", "git-commands", "git-commands.html")
+OUT = os.path.join(BASE, "jd-red-flags.html")
 
 with io.open(SRC, "r", encoding="utf-8") as f:
     html = f.read()
@@ -14,21 +16,21 @@ with io.open(SRC, "r", encoding="utf-8") as f:
 # ---- title ----
 html = html.replace(
     "<title>Jeffthedev — 5 Git Commands That Saved My Ass</title>",
-    "<title>Jeffthedev — What Tutorials Teach You vs. What the Job Is</title>",
+    "<title>Jeffthedev — 5 Red Flags in a Job Description</title>",
 )
 
 # ---- cover slide text ----
 html = html.replace(
     '<span class="tag tag-dark" style="margin-bottom:11px;">Git · Survival Kit</span>',
-    '<span class="tag tag-dark" style="margin-bottom:11px;">Career · Real Talk</span>',
+    '<span class="tag tag-dark" style="margin-bottom:11px;">Career · Job Hunt</span>',
 )
 html = html.replace(
     '<div class="heading" style="color:#fff;font-size:33px;margin-bottom:14px;">5 git commands<br><span style="color:var(--green-light);">that saved my ass</span></div>',
-    '<div class="heading" style="color:#fff;font-size:30px;margin-bottom:14px;">What tutorials teach<br><span style="color:var(--green-light);">vs. what the job is</span></div>',
+    '<div class="heading" style="color:#fff;font-size:31px;margin-bottom:14px;">5 red flags in a<br><span style="color:var(--green-light);">job description</span></div>',
 )
 html = html.replace(
     '<p class="body-text body-dark" style="max-width:265px;font-size:13px;">The exact commands I reach for when a repo goes sideways. Steal them — swipe.</p>',
-    '<p class="body-text body-dark" style="max-width:265px;font-size:13px;">Six gaps between the course and the actual job — the parts nobody puts in the tutorial. Swipe.</p>',
+    '<p class="body-text body-dark" style="max-width:265px;font-size:13px;">Some postings tell on themselves before the interview even starts. Swipe.</p>',
 )
 
 # ---- slides 2-8 (replace the whole middle block) ----
@@ -53,17 +55,11 @@ def prog_light(pct, num):
             '<div class="progress-fill progress-fill-light" style="width:%s%%;"></div></div>'
             '<span class="slide-num-light">%s</span></div>\n' % (pct, num))
 
-def callout_dark(label, text):
-    return ('          <div style="margin-top:12px;padding:10px 13px;background:rgba(34,197,94,0.06);'
-            'border:1px solid rgba(34,197,94,0.18);border-radius:9px;">'
+def callout_dark_red(label, text):
+    return ('          <div style="margin-top:12px;padding:10px 13px;background:rgba(255,107,107,0.07);'
+            'border:1px solid rgba(255,107,107,0.22);border-radius:9px;">'
             '<span style="font-family:var(--font);font-size:12px;color:rgba(255,255,255,0.7);line-height:1.5;">'
-            '<strong style="color:var(--green-light);">%s</strong> %s</span></div>\n' % (label, text))
-
-def callout_light(label, text):
-    return ('          <div style="margin-top:12px;padding:10px 13px;background:rgba(34,197,94,0.07);'
-            'border:1px solid rgba(34,197,94,0.18);border-radius:9px;">'
-            '<span style="font-family:var(--font);font-size:12px;color:#3A4A40;line-height:1.5;">'
-            '<strong style="color:var(--green-dark);">%s</strong> %s</span></div>\n' % (label, text))
+            '<strong style="color:#FF6B6B;">%s</strong> %s</span></div>\n' % (label, text))
 
 def callout_light_red(label, text):
     return ('          <div style="margin-top:12px;padding:10px 13px;background:rgba(255,107,107,0.07);'
@@ -100,118 +96,75 @@ def slide_light(tag, badge_cls, badge_txt, head1, head2, body, code_inner, callo
     s += '        </div>\n'
     return s
 
-# code line helpers for the "tutorial vs job" contrast blocks.
-# Return lines WITHOUT trailing <br>; joined later (never rstrip "<br>\n").
-def cmt_d(text):     # faint comment line, dark slide
-    return '<span class="code-cmt">%s</span>' % text
-
-def cmt_l(text):     # faint comment line, light slide
-    return '<span class="code-cmt-l">%s</span>' % text
-
-def green_d(text):   # "the tutorial" line, dark slide
-    return '<span class="code-green">%s</span>' % text
-
-def green_l(text):   # "the tutorial" line, light slide (green-dark for contrast)
-    return '<span class="code-key-l">%s</span>' % text
-
-def red_line(text):  # "the job" line, both slide types
-    return '<span class="code-red">%s</span>' % text
-
 def block(lines):
     return '            ' + '<br>\n            '.join(lines) + '\n'
 
+def quote_dark(quote, note):
+    return block([
+        '<span class="code-red">%s</span>' % quote,
+        '<span class="code-cmt">// %s</span>' % note,
+    ])
+
+def quote_light(quote, note):
+    return block([
+        '<span class="code-red">%s</span>' % quote,
+        '<span class="code-cmt-l">// %s</span>' % note,
+    ])
+
 slides = []
 
-# SLIDE 2 — #1 Git (dark)
-code2 = block([
-    cmt_d("// the tutorial"),
-    green_d("git add . → commit → push"),
-    cmt_d("// the job — friday, 4:47pm"),
-    red_line("CONFLICT: merge conflict in 14 files"),
-])
+# SLIDE 2 — #1 Scope (dark)
 slides.append(slide_dark(
-    "#1 · Git", "badge-red", "Reality check",
-    "The git you learn,", "the git you survive",
-    "Tutorials end at push. The job starts where the history gets weird.",
-    code2,
-    callout_dark("Real talk →", "git stash and git reflog will save you more times than any course ever did.")
+    "#1 · Scope", "badge-red", "Red flag",
+    "Fast-paced", "environment",
+    "Translation: no defined role, and you're about to become everyone's overflow valve.",
+    quote_dark('"fast-paced, wears many hats"', "we're understaffed and haven't hired a plan"),
+    callout_dark_red("Translation:", "If the role can't be described in one sentence, it hasn't been thought through.")
 ))
 
-# SLIDE 3 — #2 Writing code (light)
-code3 = block([
-    cmt_l("// the tutorial — blank canvas"),
-    green_l("npx create-react-app my-app"),
-    cmt_l("// the job — 3 hours of reading later"),
-    red_line("1 file changed, +1 −1"),
-])
+# SLIDE 3 — #2 The number (light)
 slides.append(slide_light(
-    "#2 · The code", "badge-green", "The real skill",
-    "Less writing code,", "more reading it",
-    "You dream of greenfield. You inherit eight years of someone else’s decisions.",
-    code3,
-    callout_light("Tip:", "Reading code is the real skill — you’ll do ten times more of it than writing.")
+    "#2 · The number", "badge-red", "Red flag",
+    "Competitive", "salary",
+    "Competitive compared to what? It's a number they won't say to your face.",
+    quote_light('"competitive salary" (no range)', "we hope you don't compare offers"),
+    callout_light_red("Translation:", "Pay transparency exists. No range in 2026 is a choice, not an oversight.")
 ))
 
-# SLIDE 4 — #3 Requirements (dark)
-code4 = block([
-    cmt_d("// the tutorial"),
-    green_d("spec.md — clear, complete, final"),
-    cmt_d("// the job, mid-sprint"),
-    red_line("“small change” → half the feature rewritten"),
-])
+# SLIDE 4 — #3 The buzzword (dark)
 slides.append(slide_dark(
-    "#3 · Requirements", "badge-red", "Moving target",
-    "A written spec,", "a moving target",
-    "The course hands you requirements. The job hands you a vibe and a deadline.",
-    code4,
-    callout_dark("Rule:", "Ask the clarifying questions before you code — not after the demo.")
+    "#3 · The buzzword", "badge-red", "Red flag",
+    "Looking for a", "rockstar ninja",
+    "The vocabulary is a decade old. So, often, is the codebase and the culture.",
+    quote_dark('"rockstar / ninja / 10x engineer"', "we want overperformance at underpay"),
+    callout_dark_red("Translation:", "Job titles from 2013 usually come with management styles from 2013.")
 ))
 
-# SLIDE 5 — #4 Debugging (light)
-code5 = block([
-    cmt_l("// the tutorial"),
-    green_l("Error at line 42 → fix line 42"),
-    cmt_l("// the job"),
-    red_line("passes locally · crashes in prod"),
-    red_line("status: cannot reproduce"),
-])
+# SLIDE 5 — #4 The fine print (light)
 slides.append(slide_light(
-    "#4 · Debugging", "badge-red", "Prod only",
-    "Errors with answers,", "bugs with alibis",
-    "Tutorial bugs point at a line. Real bugs only show up when a real user is watching.",
-    code5,
-    callout_light_red("Warning:", "“Works on my machine” are the four most expensive words in software.")
+    "#4 · The fine print", "badge-red", "Red flag",
+    "Occasional weekend", "work required",
+    "Overtime isn't occasional when it's already written into the posting before you've started.",
+    quote_light('"must be willing to work weekends"', "unpaid overtime, pre-negotiated for you"),
+    callout_light_red("Translation:", "If it's in the JD, it's not the exception — it's the actual schedule.")
 ))
 
-# SLIDE 6 — #5 The calendar (dark)
-code6 = block([
-    cmt_d("// the tutorial"),
-    green_d("09:00 – 17:00 → deep work"),
-    cmt_d("// the job"),
-    red_line("09:30 standup · 11:00 sync"),
-    red_line("14:00 “quick call?” · 16:00 finally code"),
-])
+# SLIDE 6 — #5 The math doesn't work (dark)
 slides.append(slide_dark(
-    "#5 · The calendar", "badge-red", "Meetings",
-    "Eight hours of flow,", "meet your calendar",
-    "You pictured all-day deep work. Your calendar had other plans.",
-    code6,
-    callout_dark("Rule:", "Block your focus time like it’s production — because your output is.")
+    "#5 · The math", "badge-red", "Red flag",
+    "5+ years in a", "2-year-old framework",
+    "Nobody proofread this. If they can't manage a job post, notice the pattern.",
+    quote_dark('"5+ years required" (framework shipped 2 years ago)', "they don't know what they're asking for"),
+    callout_dark_red("Translation:", "Written by someone who's never opened the docs for the thing they're hiring for.")
 ))
 
-# SLIDE 7 — #6 Shipping (light)
-code7 = block([
-    cmt_l("// the tutorial"),
-    green_l("npm run dev → it works → done"),
-    cmt_l("// the job"),
-    red_line("deploy → 500 → missing env var → rollback"),
-])
+# SLIDE 7 — Bonus, the vibe (light)
 slides.append(slide_light(
-    "#6 · Shipping", "badge-green", "Done ≠ done",
-    "“It works” is easy,", "“it’s live” is the job",
-    "The tutorial ends when the code runs. The job starts when real users touch it.",
-    code7,
-    callout_light("Remember:", "Done means deployed, monitored, and still standing on Monday.")
+    "Bonus · The vibe", "badge-red", "Watch for it",
+    "We're like a", "family here",
+    "Families don't performance-review you. Watch what this phrase gets used to excuse.",
+    quote_light('"we\'re like a family here"', "guilt is the retention strategy"),
+    callout_light_red("Translation:", "A healthy team doesn't need a metaphor to stop you from asking for boundaries.")
 ))
 
 # SLIDE 8 — takeaway (dark, custom layout matching git-commands)
@@ -221,19 +174,19 @@ takeaway = (
 '        <div style="position:absolute;top:-40px;left:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(34,197,94,0.08) 0%,transparent 70%);pointer-events:none;z-index:1;"></div>\n'
 '        <div style="position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:0 32px 52px;">\n'
 '          <span class="tag tag-dark" style="margin-bottom:11px;">The takeaway</span>\n'
-'          <div class="heading" style="color:#fff;margin-bottom:14px;font-size:27px;">The gap isn’t a scam —<br><span style="color:var(--green-light);">it’s the actual job.</span></div>\n'
+'          <div class="heading" style="color:#fff;margin-bottom:14px;font-size:27px;">Red flags are<br><span style="color:var(--green-light);">just bad writing.</span></div>\n'
 '          <div style="display:flex;flex-direction:column;gap:9px;">\n'
 '            <div style="padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;">\n'
-'              <div style="font-size:13px;font-weight:700;color:#fff;font-family:var(--font);margin-bottom:5px;">Tutorials teach syntax</div>\n'
-'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">The job teaches judgment — tradeoffs, legacy code, and working with people.</p>\n'
+'              <div style="font-size:13px;font-weight:700;color:#fff;font-family:var(--font);margin-bottom:5px;">Vague means unplanned</div>\n'
+'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">If they can\'t describe the role clearly, they haven\'t figured out what they need.</p>\n'
 '            </div>\n'
 '            <div style="padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;">\n'
-'              <div style="font-size:13px;font-weight:700;color:#fff;font-family:var(--font);margin-bottom:5px;">Keep doing the courses</div>\n'
-'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">They get you in the door. Reading code, asking questions, and shipping keep you there.</p>\n'
+'              <div style="font-size:13px;font-weight:700;color:#fff;font-family:var(--font);margin-bottom:5px;">Silence is a number they know is low</div>\n'
+'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">Missing salary range, missing team size — they\'re all the same tell.</p>\n'
 '            </div>\n'
 '            <div style="padding:12px 14px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.18);border-radius:10px;">\n'
 '              <div style="font-size:13px;font-weight:700;color:var(--green-light);font-family:var(--font);margin-bottom:5px;">Real talk &rarr;</div>\n'
-'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">Every senior you admire was once shocked by this exact list. You’ll be fine.</p>\n'
+'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">Reading the JD closely isn\'t being picky — it\'s doing the interview before the interview.</p>\n'
 '            </div>\n'
 '          </div>\n'
 '        </div>\n'
@@ -253,20 +206,16 @@ html = html[:a] + mid + html[b:]
 
 # ---- CTA slide ----
 html = html.replace(
-    '<span class="tag" style="color:rgba(255,255,255,0.5);letter-spacing:2px;font-size:10px;font-weight:600;text-transform:uppercase;display:block;margin-bottom:10px;">The Cheat Sheet</span>',
-    '<span class="tag" style="color:rgba(255,255,255,0.5);letter-spacing:2px;font-size:10px;font-weight:600;text-transform:uppercase;display:block;margin-bottom:10px;">The Reality Check</span>',
-)
-html = html.replace(
     '<div class="heading" style="color:#fff;font-size:24px;margin-bottom:18px;line-height:1.15;">5 commands. Save them<br>before you need them.</div>',
-    '<div class="heading" style="color:#fff;font-size:24px;margin-bottom:18px;line-height:1.15;">Screenshot this before<br>your first dev job.</div>',
+    '<div class="heading" style="color:#fff;font-size:24px;margin-bottom:18px;line-height:1.15;">5 phrases to read twice<br>before you apply.</div>',
 )
 
 cta_items = [
-    "Less writing code, more reading it",
-    "Requirements move — ask questions first",
-    "“Works on my machine” isn’t done",
-    "Guard your focus time from meetings",
-    "Done = deployed and surviving real users",
+    "“fast-paced” — undefined role, you're the overflow",
+    "no salary range — they hope you won't compare",
+    "“rockstar / ninja” — decade-old culture, still around",
+    "“occasional weekends” — the real schedule, not the exception",
+    "“like a family” — guilt dressed up as culture",
 ]
 old_items = [
     "reflog — recover seemingly lost commits",
@@ -284,7 +233,7 @@ for old, new in zip(old_items, cta_items):
 # ---- caption ----
 html = html.replace(
     '<strong>Jeffthedev__</strong> 5 git commands that have saved me more times than I can count. Save this before your next "oh no" moment. #git #webdev #programming',
-    '<strong>Jeffthedev__</strong> What the tutorials teach you vs. what the job actually is — the parts no course covers. Which one hit you hardest? #webdev #programming #softwareengineer',
+    '<strong>Jeffthedev__</strong> 5 phrases in a job description that are quietly telling on the company. Save this before your next application round. #careertips #webdev #techjobs',
 )
 
 with io.open(OUT, "w", encoding="utf-8") as f:

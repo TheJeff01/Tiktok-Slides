@@ -6,8 +6,10 @@
 #   color-palettes-b.html — frameless/minimal (grid bg, card, handle pill, no chrome)
 
 import io
+import os
 
-SRC = "git-commands.html"
+BASE = os.path.dirname(os.path.abspath(__file__))
+SRC = os.path.join(BASE, "..", "git-commands", "git-commands.html")
 
 with io.open(SRC, "r", encoding="utf-8") as f:
     base_html = f.read()
@@ -232,6 +234,6 @@ def build(version):
 
 for version, out in [("a", "color-palettes-a.html"), ("b", "color-palettes-b.html")]:
     html = build(version)
-    with io.open(out, "w", encoding="utf-8") as f:
+    with io.open(os.path.join(BASE, out), "w", encoding="utf-8") as f:
         f.write(html)
     print("wrote", out, "len", len(html))

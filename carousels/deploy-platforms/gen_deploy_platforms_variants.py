@@ -7,8 +7,10 @@
 #                                 radial glow + ghost numeral behind the heading
 
 import io
+import os
 
-SRC = "git-commands.html"
+BASE = os.path.dirname(os.path.abspath(__file__))
+SRC = os.path.join(BASE, "..", "git-commands", "git-commands.html")
 
 with io.open(SRC, "r", encoding="utf-8") as f:
     base_html = f.read()
@@ -236,6 +238,6 @@ def build(variant):
 
 for variant, out in [("hero", "deploy-platforms-hero.html"), ("glow", "deploy-platforms-glow.html")]:
     html = build(variant)
-    with io.open(out, "w", encoding="utf-8") as f:
+    with io.open(os.path.join(BASE, out), "w", encoding="utf-8") as f:
         f.write(html)
     print("wrote", out, "len", len(html))

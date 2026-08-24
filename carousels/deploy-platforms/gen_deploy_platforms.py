@@ -7,9 +7,11 @@
 # wordmark / CTA) are reused verbatim.
 
 import io
+import os
 
-SRC = "git-commands.html"
-OUT = "deploy-platforms.html"
+BASE = os.path.dirname(os.path.abspath(__file__))
+SRC = os.path.join(BASE, "..", "git-commands", "git-commands.html")
+OUT = os.path.join(BASE, "deploy-platforms.html")
 
 with io.open(SRC, "r", encoding="utf-8") as f:
     html = f.read()

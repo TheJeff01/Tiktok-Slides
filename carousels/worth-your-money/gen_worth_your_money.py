@@ -4,9 +4,11 @@
 # Base64 images (avatar / cover portrait / wordmark / CTA) are reused verbatim.
 
 import io
+import os
 
-SRC = "git-commands.html"
-OUT = "worth-your-money.html"
+BASE = os.path.dirname(os.path.abspath(__file__))
+SRC = os.path.join(BASE, "..", "git-commands", "git-commands.html")
+OUT = os.path.join(BASE, "worth-your-money.html")
 
 with io.open(SRC, "r", encoding="utf-8") as f:
     html = f.read()

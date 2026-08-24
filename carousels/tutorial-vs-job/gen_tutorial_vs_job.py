@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-# Build nextjs-vs-tanstack.html from the git-commands.html code-block shell,
+# Build tutorial-vs-job.html from the git-commands.html code-block shell,
 # swapping only the text content (cover, 7 content slides, CTA, caption, title).
 # Base64 images (avatar / cover portrait / wordmark / CTA) are reused verbatim.
 
 import io
+import os
 
-SRC = "git-commands.html"
-OUT = "nextjs-vs-tanstack.html"
+BASE = os.path.dirname(os.path.abspath(__file__))
+SRC = os.path.join(BASE, "..", "git-commands", "git-commands.html")
+OUT = os.path.join(BASE, "tutorial-vs-job.html")
 
 with io.open(SRC, "r", encoding="utf-8") as f:
     html = f.read()
@@ -14,21 +16,21 @@ with io.open(SRC, "r", encoding="utf-8") as f:
 # ---- title ----
 html = html.replace(
     "<title>Jeffthedev — 5 Git Commands That Saved My Ass</title>",
-    "<title>Jeffthedev — Next.js vs TanStack Start</title>",
+    "<title>Jeffthedev — What Tutorials Teach You vs. What the Job Is</title>",
 )
 
 # ---- cover slide text ----
 html = html.replace(
     '<span class="tag tag-dark" style="margin-bottom:11px;">Git · Survival Kit</span>',
-    '<span class="tag tag-dark" style="margin-bottom:11px;">React · Head to Head</span>',
+    '<span class="tag tag-dark" style="margin-bottom:11px;">Career · Real Talk</span>',
 )
 html = html.replace(
     '<div class="heading" style="color:#fff;font-size:33px;margin-bottom:14px;">5 git commands<br><span style="color:var(--green-light);">that saved my ass</span></div>',
-    '<div class="heading" style="color:#fff;font-size:30px;margin-bottom:14px;">Next.js vs TanStack<br><span style="color:var(--green-light);">which one in 2026?</span></div>',
+    '<div class="heading" style="color:#fff;font-size:30px;margin-bottom:14px;">What tutorials teach<br><span style="color:var(--green-light);">vs. what the job is</span></div>',
 )
 html = html.replace(
     '<p class="body-text body-dark" style="max-width:265px;font-size:13px;">The exact commands I reach for when a repo goes sideways. Steal them — swipe.</p>',
-    '<p class="body-text body-dark" style="max-width:265px;font-size:13px;">Two ways to build full-stack React that disagree on almost everything. The honest comparison — swipe.</p>',
+    '<p class="body-text body-dark" style="max-width:265px;font-size:13px;">Six gaps between the course and the actual job — the parts nobody puts in the tutorial. Swipe.</p>',
 )
 
 # ---- slides 2-8 (replace the whole middle block) ----
@@ -100,22 +102,21 @@ def slide_light(tag, badge_cls, badge_txt, head1, head2, body, code_inner, callo
     s += '        </div>\n'
     return s
 
-# code line helpers — comparison blocks: faint framework label comment,
-# then a green approach line; red is reserved for genuine pain points.
-# Lines returned WITHOUT trailing <br>; joined later (never rstrip "<br>\n").
-def cmt_d(text):
+# code line helpers for the "tutorial vs job" contrast blocks.
+# Return lines WITHOUT trailing <br>; joined later (never rstrip "<br>\n").
+def cmt_d(text):     # faint comment line, dark slide
     return '<span class="code-cmt">%s</span>' % text
 
-def cmt_l(text):
+def cmt_l(text):     # faint comment line, light slide
     return '<span class="code-cmt-l">%s</span>' % text
 
-def green_d(text):
+def green_d(text):   # "the tutorial" line, dark slide
     return '<span class="code-green">%s</span>' % text
 
-def green_l(text):
+def green_l(text):   # "the tutorial" line, light slide (green-dark for contrast)
     return '<span class="code-key-l">%s</span>' % text
 
-def red_line(text):
+def red_line(text):  # "the job" line, both slide types
     return '<span class="code-red">%s</span>' % text
 
 def block(lines):
@@ -123,94 +124,96 @@ def block(lines):
 
 slides = []
 
-# SLIDE 2 — #1 Philosophy (dark)
+# SLIDE 2 — #1 Git (dark)
 code2 = block([
-    cmt_d("// next.js"),
-    green_d("server components · client islands"),
-    cmt_d("// tanstack start"),
-    green_d("client app first · SSR when it helps"),
+    cmt_d("// the tutorial"),
+    green_d("git add . → commit → push"),
+    cmt_d("// the job — friday, 4:47pm"),
+    red_line("CONFLICT: merge conflict in 14 files"),
 ])
 slides.append(slide_dark(
-    "#1 · Philosophy", "badge-green", "Big picture",
-    "Server-first", "meets client-first",
-    "Next.js starts on the server and sprinkles in the client. TanStack starts from the client and reaches back.",
+    "#1 · Git", "badge-red", "Reality check",
+    "The git you learn,", "the git you survive",
+    "Tutorials end at push. The job starts where the history gets weird.",
     code2,
-    callout_dark("Real talk →", "Neither is wrong. They optimize for different kinds of apps.")
+    callout_dark("Real talk →", "git stash and git reflog will save you more times than any course ever did.")
 ))
 
-# SLIDE 3 — #2 Routing (light)
+# SLIDE 3 — #2 Writing code (light)
 code3 = block([
-    cmt_l("// next.js — app router"),
-    green_l("app/blog/[slug]/page.tsx"),
-    cmt_l("// tanstack router"),
-    green_l("routes/blog.$slug.tsx → params typed"),
+    cmt_l("// the tutorial — blank canvas"),
+    green_l("npx create-react-app my-app"),
+    cmt_l("// the job — 3 hours of reading later"),
+    red_line("1 file changed, +1 −1"),
 ])
 slides.append(slide_light(
-    "#2 · Routing", "badge-green", "Type-safe",
-    "Same idea,", "different guarantees",
-    "Both route from files. Only one can prove your links and params are real at compile time.",
+    "#2 · The code", "badge-green", "The real skill",
+    "Less writing code,", "more reading it",
+    "You dream of greenfield. You inherit eight years of someone else’s decisions.",
     code3,
-    callout_light("Tip:", "In TanStack, a broken Link is a type error before it’s ever a 404.")
+    callout_light("Tip:", "Reading code is the real skill — you’ll do ten times more of it than writing.")
 ))
 
-# SLIDE 4 — #3 Data fetching (dark)
+# SLIDE 4 — #3 Requirements (dark)
 code4 = block([
-    cmt_d("// next.js — in a server component"),
-    green_d("const posts = await getPosts()"),
-    cmt_d("// tanstack — route loader"),
-    green_d("loader: () => ensureQueryData(posts)"),
+    cmt_d("// the tutorial"),
+    green_d("spec.md — clear, complete, final"),
+    cmt_d("// the job, mid-sprint"),
+    red_line("“small change” → half the feature rewritten"),
 ])
 slides.append(slide_dark(
-    "#3 · Data", "badge-green", "RSC vs loaders",
-    "Fetch in render,", "or load before it",
-    "Next fetches while the server renders. TanStack loads before render and hands it to Query.",
+    "#3 · Requirements", "badge-red", "Moving target",
+    "A written spec,", "a moving target",
+    "The course hands you requirements. The job hands you a vibe and a deadline.",
     code4,
-    callout_dark("Real talk →", "Next hides the wire, TanStack shows you the cache. Pick the magic you can debug.")
+    callout_dark("Rule:", "Ask the clarifying questions before you code — not after the demo.")
 ))
 
-# SLIDE 5 — #4 Caching (light, the pain point)
+# SLIDE 5 — #4 Debugging (light)
 code5 = block([
-    cmt_l("// next.js"),
-    red_line("4 layers: memo · data · route · router"),
-    cmt_l("// tanstack"),
-    green_l("one cache: TanStack Query — you own it"),
+    cmt_l("// the tutorial"),
+    green_l("Error at line 42 → fix line 42"),
+    cmt_l("// the job"),
+    red_line("passes locally · crashes in prod"),
+    red_line("status: cannot reproduce"),
 ])
 slides.append(slide_light(
-    "#4 · Caching", "badge-red", "Pain point",
-    "Four caches,", "or just one",
-    "The loudest Next.js complaint isn’t RSC — it’s guessing which cache served you stale data.",
+    "#4 · Debugging", "badge-red", "Prod only",
+    "Errors with answers,", "bugs with alibis",
+    "Tutorial bugs point at a line. Real bugs only show up when a real user is watching.",
     code5,
-    callout_light_red("Warning:", "If you can’t explain why a page is stale, the cache owns you — not the other way round.")
+    callout_light_red("Warning:", "“Works on my machine” are the four most expensive words in software.")
 ))
 
-# SLIDE 6 — #5 Server calls (dark)
+# SLIDE 6 — #5 The calendar (dark)
 code6 = block([
-    cmt_d("// next.js — server action"),
-    green_d("'use server' → form actions"),
-    cmt_d("// tanstack"),
-    green_d("createServerFn() → typed RPC"),
+    cmt_d("// the tutorial"),
+    green_d("09:00 – 17:00 → deep work"),
+    cmt_d("// the job"),
+    red_line("09:30 standup · 11:00 sync"),
+    red_line("14:00 “quick call?” · 16:00 finally code"),
 ])
 slides.append(slide_dark(
-    "#5 · Server calls", "badge-green", "Typed RPC",
-    "Both are a POST —", "one types the trip",
-    "Server actions and server functions compile to the same thing. The difference is what TypeScript knows.",
+    "#5 · The calendar", "badge-red", "Meetings",
+    "Eight hours of flow,", "meet your calendar",
+    "You pictured all-day deep work. Your calendar had other plans.",
     code6,
-    callout_dark("Rule:", "If the client calls the server, the types should make the round trip too.")
+    callout_dark("Rule:", "Block your focus time like it’s production — because your output is.")
 ))
 
-# SLIDE 7 — #6 Choosing (light)
+# SLIDE 7 — #6 Shipping (light)
 code7 = block([
-    cmt_l("// next.js"),
-    green_l("huge ecosystem · hiring pool · Vercel DX"),
-    cmt_l("// tanstack"),
-    green_l("Vite under the hood → deploy anywhere"),
+    cmt_l("// the tutorial"),
+    green_l("npm run dev → it works → done"),
+    cmt_l("// the job"),
+    red_line("deploy → 500 → missing env var → rollback"),
 ])
 slides.append(slide_light(
-    "#6 · Choosing", "badge-green", "Tradeoffs",
-    "The résumé pick,", "or the control pick",
-    "Next.js has a decade of answers on Stack Overflow. TanStack gives you the whole machine, visible.",
+    "#6 · Shipping", "badge-green", "Done ≠ done",
+    "“It works” is easy,", "“it’s live” is the job",
+    "The tutorial ends when the code runs. The job starts when real users touch it.",
     code7,
-    callout_light("Tip:", "Boring reasons — team, hiring, docs — beat benchmark charts every time.")
+    callout_light("Remember:", "Done means deployed, monitored, and still standing on Monday.")
 ))
 
 # SLIDE 8 — takeaway (dark, custom layout matching git-commands)
@@ -220,19 +223,19 @@ takeaway = (
 '        <div style="position:absolute;top:-40px;left:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(34,197,94,0.08) 0%,transparent 70%);pointer-events:none;z-index:1;"></div>\n'
 '        <div style="position:relative;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;height:100%;padding:0 32px 52px;">\n'
 '          <span class="tag tag-dark" style="margin-bottom:11px;">The takeaway</span>\n'
-'          <div class="heading" style="color:#fff;margin-bottom:14px;font-size:27px;">It’s not a war —<br><span style="color:var(--green-light);">it’s a fit question.</span></div>\n'
+'          <div class="heading" style="color:#fff;margin-bottom:14px;font-size:27px;">The gap isn’t a scam —<br><span style="color:var(--green-light);">it’s the actual job.</span></div>\n'
 '          <div style="display:flex;flex-direction:column;gap:9px;">\n'
 '            <div style="padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;">\n'
-'              <div style="font-size:13px;font-weight:700;color:#fff;font-family:var(--font);margin-bottom:5px;">Pick Next.js when…</div>\n'
-'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">Content and SEO carry the app, pages mix marketing with product, and you want the ecosystem to carry you.</p>\n'
+'              <div style="font-size:13px;font-weight:700;color:#fff;font-family:var(--font);margin-bottom:5px;">Tutorials teach syntax</div>\n'
+'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">The job teaches judgment — tradeoffs, legacy code, and working with people.</p>\n'
 '            </div>\n'
 '            <div style="padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;">\n'
-'              <div style="font-size:13px;font-weight:700;color:#fff;font-family:var(--font);margin-bottom:5px;">Pick TanStack when…</div>\n'
-'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">It’s an app-like dashboard, the client does the heavy lifting, and you want types end to end with Query at the core.</p>\n'
+'              <div style="font-size:13px;font-weight:700;color:#fff;font-family:var(--font);margin-bottom:5px;">Keep doing the courses</div>\n'
+'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">They get you in the door. Reading code, asking questions, and shipping keep you there.</p>\n'
 '            </div>\n'
 '            <div style="padding:12px 14px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.18);border-radius:10px;">\n'
 '              <div style="font-size:13px;font-weight:700;color:var(--green-light);font-family:var(--font);margin-bottom:5px;">Real talk &rarr;</div>\n'
-'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">You’re not marrying a framework — you’re hiring one for this app. Rehire per project.</p>\n'
+'              <p style="font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--font);line-height:1.5;">Every senior you admire was once shocked by this exact list. You’ll be fine.</p>\n'
 '            </div>\n'
 '          </div>\n'
 '        </div>\n'
@@ -253,19 +256,19 @@ html = html[:a] + mid + html[b:]
 # ---- CTA slide ----
 html = html.replace(
     '<span class="tag" style="color:rgba(255,255,255,0.5);letter-spacing:2px;font-size:10px;font-weight:600;text-transform:uppercase;display:block;margin-bottom:10px;">The Cheat Sheet</span>',
-    '<span class="tag" style="color:rgba(255,255,255,0.5);letter-spacing:2px;font-size:10px;font-weight:600;text-transform:uppercase;display:block;margin-bottom:10px;">The Verdict</span>',
+    '<span class="tag" style="color:rgba(255,255,255,0.5);letter-spacing:2px;font-size:10px;font-weight:600;text-transform:uppercase;display:block;margin-bottom:10px;">The Reality Check</span>',
 )
 html = html.replace(
     '<div class="heading" style="color:#fff;font-size:24px;margin-bottom:18px;line-height:1.15;">5 commands. Save them<br>before you need them.</div>',
-    '<div class="heading" style="color:#fff;font-size:24px;margin-bottom:18px;line-height:1.15;">Save this for the next<br>framework debate.</div>',
+    '<div class="heading" style="color:#fff;font-size:24px;margin-bottom:18px;line-height:1.15;">Screenshot this before<br>your first dev job.</div>',
 )
 
 cta_items = [
-    "Next = server-first · TanStack = client-first",
-    "TanStack routes are typed end to end",
-    "Four Next.js caches vs one Query cache",
-    "‘use server’ vs createServerFn()",
-    "Choose per app, not per hype cycle",
+    "Less writing code, more reading it",
+    "Requirements move — ask questions first",
+    "“Works on my machine” isn’t done",
+    "Guard your focus time from meetings",
+    "Done = deployed and surviving real users",
 ]
 old_items = [
     "reflog — recover seemingly lost commits",
@@ -283,7 +286,7 @@ for old, new in zip(old_items, cta_items):
 # ---- caption ----
 html = html.replace(
     '<strong>Jeffthedev__</strong> 5 git commands that have saved me more times than I can count. Save this before your next "oh no" moment. #git #webdev #programming',
-    '<strong>Jeffthedev__</strong> Next.js vs TanStack Start — the honest comparison, no fanboying. Which side are you on? #react #nextjs #tanstack #webdev',
+    '<strong>Jeffthedev__</strong> What the tutorials teach you vs. what the job actually is — the parts no course covers. Which one hit you hardest? #webdev #programming #softwareengineer',
 )
 
 with io.open(OUT, "w", encoding="utf-8") as f:
